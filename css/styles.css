@@ -7,9 +7,17 @@
     --red: #e11d2e;
     --red-text: #ff5a68;
     --line: #2a2a2a
+=======
+    --canvas: #0f76dece;
+    --ink: #10233f;
+    --muted: #5a6779;
+    --red: #c8102e;
+    --surface: #fff;
+    --line: #cfd6de;
+    --head: Impact, "Haettenschweiler", "Arial Narrow Bold", sans-serif
 }
 
-* {
+*{
     box-sizing: border-box
 }
 
