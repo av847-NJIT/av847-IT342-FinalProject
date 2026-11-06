@@ -7,6 +7,7 @@
     --line: #cfd6de;
     --head: Impact, "Haettenschweiler", "Arial Narrow Bold", sans-serif
 }
+
 /*
 @media (prefers-color-scheme:dark) {
     :root {
@@ -19,6 +20,7 @@
     }
 }
 */
+
 * {
     box-sizing: border-box
 }
