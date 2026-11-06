@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BoxingBlog</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+
+<body>
+    <header class="site">
+        <div class="wrap bar">
+            <a class="logo" href="/index.html">BoxingBlog</a>
+            <nav><a href="/login.html">Log in</a><a class="cta" href="/register.html">Register</a></nav>
+        </div>
+    </header>
+    <main class="wrap">
+        <section class="hero">
+            <h1>Boxing, written by its fans.</h1>
+            <p>Fight recaps, training logs, and technique breakdowns from people who watch, train, and obsess over the
+                sport.</p>
+            <input type="search" id="q" placeholder="Search posts, authors, or tags" aria-label="Search posts">
+            <div class="chips" id="chips" role="group" aria-label="Filter by topic"></div>
+        </section>
+        <section class="grid" id="posts" aria-live="polite"></section>
+    </main>
+    <footer>
+        <div class="wrap">BoxingBlog is a class project. Sample posts shown.</div>
+    </footer>
+    <script>
+        const posts = [
+            { t: "Round-by-round recap of the title fight", a: "jabmaster", tag: "Fight recap", d: "Nov 2", x: "The pace, the clinch work, and the late knockdown that decided it." },
+            { t: "My first month of boxing training", a: "roadwork_rae", tag: "Training", d: "Nov 1", x: "Shadowboxing, jump rope, and why my calves hurt in new ways." },
+            { t: "Fixing a weak jab", a: "southpaw_sam", tag: "Technique", d: "Oct 30", x: "Three small changes to stance and timing that added snap." },
+            { t: "Hand wraps vs. gel wraps", a: "gloveguru", tag: "Gear", d: "Oct 28", x: "What each one protects and which fits a beginner budget." },
+            { t: "Fight card to watch this month", a: "ringside_rob", tag: "Events", d: "Oct 27", x: "Three bouts worth staying up for, ranked by style clash." },
+            { t: "Defense drills you can do at home", a: "jabmaster", tag: "Technique", d: "Oct 25", x: "Slips, rolls, and a simple mirror routine for head movement." }
+        ];
+        const tags = ["All", ...new Set(posts.map(p => p.tag))];
+        let active = "All";
+        const chips = document.getElementById("chips"), grid = document.getElementById("posts"), q = document.getElementById("q");
+        tags.forEach(t => {
+            const b = document.createElement("button"); b.type = "button"; b.textContent = t;
+            b.setAttribute("aria-pressed", t === active);
+            b.onclick = () => { active = t;[...chips.children].forEach(c => c.setAttribute("aria-pressed", c === b)); render() };
+            chips.appendChild(b)
+        });
+        function render() {
+            const s = q.value.trim().toLowerCase();
+            const list = posts.filter(p => (active === "All" || p.tag === active) && (!s || [p.t, p.a, p.tag, p.x].join(" ").toLowerCase().includes(s)));
+            grid.innerHTML = list.length ? list.map(p => `<article class="card"><span class="tag">${p.tag}</span><h3>${p.t}</h3><p>${p.x}</p><span class="meta">by ${p.a}, ${p.d}</span></article>`).join("") : '<p class="empty">No posts match. Clear the search or pick another topic.</p>';
+        }
+        q.addEventListener("input", render); render();
+    </script>
+</body>
+
+</html>
