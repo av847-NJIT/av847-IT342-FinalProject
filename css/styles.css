@@ -1,4 +1,13 @@
 :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface-2: #1b1b1b;
+    --ink: #f5f5f5;
+    --muted: #a3a3a3;
+    --red: #e11d2e;
+    --red-text: #ff5a68;
+    --line: #2a2a2a
+=======
     --canvas: #0f76dece;
     --ink: #10233f;
     --muted: #5a6779;
@@ -8,27 +17,19 @@
     --head: Impact, "Haettenschweiler", "Arial Narrow Bold", sans-serif
 }
 
-/*
-@media (prefers-color-scheme:dark) {
-    :root {
-        --canvas: #0d1726;
-        --ink: #eef2f6;
-        --muted: #9aa8ba;
-        --red: #ef4a60;
-        --surface: #14233a;
-        --line: #26384f
-    }
-}
-*/
-
-* {
+*{
     box-sizing: border-box
+}
+
+html {
+    scroll-behavior: smooth
 }
 
 body {
     margin: 0;
-    font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    background: var(--canvas);
+    min-height: 100vh;
+    font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg) radial-gradient(900px 420px at 50% -120px, rgba(225, 29, 46, .24), transparent) no-repeat;
     color: var(--ink)
 }
 
@@ -38,17 +39,23 @@ a {
 
 :focus-visible {
     outline: 3px solid var(--red);
-    outline-offset: 2px
+    outline-offset: 3px
 }
 
 .wrap {
-    max-width: 960px;
+    max-width: 1000px;
     margin: 0 auto;
     padding: 0 20px
 }
 
 .site {
-    border-bottom: 2px solid var(--ink)
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(10, 10, 10, .8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line)
 }
 
 .bar {
@@ -59,34 +66,72 @@ a {
 }
 
 .logo {
-    font: 400 28px/1 var(--head);
-    letter-spacing: .02em;
+    display: flex;
+    align-items: center;
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: -.02em;
     text-decoration: none
 }
 
+.logo::before {
+    content: "";
+    width: 12px;
+    height: 12px;
+    margin-right: 10px;
+    border-radius: 50%;
+    background: var(--red);
+    box-shadow: 0 0 14px var(--red)
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    gap: 6px
+}
+
 nav a {
-    margin-left: 16px;
+    padding: 8px 14px;
+    border-radius: 999px;
     font-weight: 600;
-    text-decoration: none
+    font-size: 15px;
+    text-decoration: none;
+    color: var(--muted);
+    transition: color .15s, background .15s
+}
+
+nav a:hover {
+    color: var(--ink);
+    background: var(--surface-2)
 }
 
 nav a.cta {
     background: var(--red);
-    color: #fff;
-    padding: 7px 14px;
-    border-radius: 4px
+    color: #fff
+}
+
+nav a.cta:hover {
+    background: #f43144
+}
+
+.hero {
+    padding-top: 32px
 }
 
 .hero h1 {
-    font: 400 clamp(42px, 9vw, 80px)/.98 var(--head);
-    margin: 40px 0 12px;
-    max-width: 11ch
+    font-size: clamp(40px, 8vw, 76px);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -.035em;
+    margin: 36px 0 16px;
+    max-width: 13ch
 }
 
 .hero p {
-    max-width: 52ch;
+    max-width: 54ch;
     color: var(--muted);
-    margin: 0 0 24px
+    font-size: 18px;
+    margin: 0 0 28px
 }
 
 input,
@@ -97,67 +142,100 @@ button {
 input[type=search],
 .field input {
     width: 100%;
-    padding: 10px 12px;
-    border: 1.5px solid var(--line);
-    border-radius: 4px;
+    padding: 12px 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
     background: var(--surface);
-    color: var(--ink)
+    color: var(--ink);
+    transition: border-color .15s, box-shadow .15s
+}
+
+input::placeholder {
+    color: #6e6e6e
+}
+
+input[type=search]:focus,
+.field input:focus {
+    outline: none;
+    border-color: var(--red);
+    box-shadow: 0 0 0 4px rgba(225, 29, 46, .2)
 }
 
 .chips {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin: 14px 0 0
+    margin: 16px 0 0
 }
 
 .chips button {
-    padding: 6px 14px;
-    border: 1.5px solid var(--ink);
+    padding: 7px 16px;
+    border: 1px solid var(--line);
     border-radius: 999px;
-    background: transparent;
-    color: var(--ink);
-    cursor: pointer
+    background: var(--surface);
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all .15s
+}
+
+.chips button:hover {
+    border-color: var(--red);
+    color: var(--ink)
 }
 
 .chips button[aria-pressed=true] {
-    background: var(--ink);
-    color: var(--canvas)
+    background: var(--red);
+    border-color: var(--red);
+    color: #fff
 }
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-    gap: 16px;
-    margin: 28px 0 48px
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 18px;
+    margin: 32px 0 56px
 }
 
 .card {
     background: var(--surface);
     border: 1px solid var(--line);
-    border-left: 6px solid var(--red);
-    border-radius: 4px;
-    padding: 16px
+    border-radius: 16px;
+    padding: 20px;
+    transition: transform .2s, border-color .2s, box-shadow .2s
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    border-color: var(--red);
+    box-shadow: 0 14px 34px rgba(225, 29, 46, .18)
 }
 
 .card h3 {
-    margin: 4px 0 6px;
-    font-size: 18px;
-    line-height: 1.25
+    margin: 12px 0 8px;
+    font-size: 19px;
+    line-height: 1.3;
+    letter-spacing: -.01em
 }
 
 .card p {
-    margin: 0 0 10px
+    margin: 0 0 14px;
+    color: var(--muted)
 }
 
 .tag {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 999px;
+    background: rgba(225, 29, 46, .14);
+    color: var(--red-text);
     font-weight: 700;
-    font-size: 14px;
-    color: var(--red)
+    font-size: 13px
 }
 
 .meta {
-    color: var(--muted);
+    color: #808080;
     font-size: 14px
 }
 
@@ -167,56 +245,85 @@ input[type=search],
 }
 
 .panel {
-    max-width: 420px;
-    margin: 48px auto;
+    max-width: 440px;
+    margin: 56px auto;
     background: var(--surface);
     border: 1px solid var(--line);
-    border-top: 6px solid var(--red);
-    border-radius: 4px;
-    padding: 28px
+    border-top: 3px solid var(--red);
+    border-radius: 20px;
+    padding: 34px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, .5)
 }
 
 .panel h1 {
-    font: 400 40px/1 var(--head);
-    margin: 0 0 18px
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -.03em;
+    line-height: 1.1;
+    margin: 0 0 24px
 }
 
 .field {
-    margin-bottom: 14px
+    margin-bottom: 16px
 }
 
 .field label {
     display: block;
     font-weight: 600;
-    margin-bottom: 4px
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: var(--muted)
 }
 
 .primary {
     width: 100%;
-    padding: 11px;
+    padding: 13px;
     border: 0;
-    border-radius: 4px;
+    border-radius: 12px;
     background: var(--red);
     color: #fff;
     font-weight: 700;
-    cursor: pointer
+    cursor: pointer;
+    transition: background .15s, transform .15s
+}
+
+.primary:hover {
+    background: #f43144;
+    transform: translateY(-1px)
 }
 
 .msg {
     min-height: 1.5em;
-    margin: 12px 0 0;
-    color: var(--muted);
+    margin: 14px 0 0;
+    color: var(--red-text);
     font-size: 14px
 }
 
 .alt {
-    margin: 16px 0 0;
-    font-size: 15px
+    margin: 18px 0 0;
+    font-size: 15px;
+    color: var(--muted)
+}
+
+.alt a {
+    color: var(--red-text);
+    font-weight: 600
 }
 
 footer {
     border-top: 1px solid var(--line);
-    padding: 20px 0;
-    color: var(--muted);
+    padding: 24px 0;
+    color: #808080;
     font-size: 14px
+}
+
+@media (prefers-reduced-motion:reduce) {
+    * {
+        transition: none !important
+    }
+
+    .card:hover,
+    .primary:hover {
+        transform: none
+    }
 }
