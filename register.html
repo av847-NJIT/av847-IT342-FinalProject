@@ -12,35 +12,70 @@
     <header class="site">
         <div class="wrap bar">
             <a class="logo" href="/index.html">BoxingBlog</a>
-            <nav><a href="/login.html">Log in</a><a class="cta" href="/register.html">Register</a></nav>
+            <nav id="nav"></nav>
         </div>
     </header>
     <main class="wrap">
         <form class="panel" id="f" novalidate>
             <h1>Create account</h1>
-            <div class="field"><label for="username">Username</label><input id="username" name="username" type="text"
+            <div class="field"><label for="nickname">Username</label><input id="nickname" name="nickname" type="text"
                     required minlength="3" maxlength="20" pattern="[A-Za-z0-9_]+"
-                    title="Letters, numbers, and underscores only" autocomplete="username"></div>
+                    title="Letters, numbers, and underscores only" autocomplete="nickname"></div>
             <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" required
                     autocomplete="email"></div>
             <div class="field"><label for="password">Password</label><input id="password" name="password"
-                    type="password" required minlength="8" autocomplete="new-password"></div>
+                    type="password" required minlength="8" autocomplete="new-password"><small class="meta">8+ characters
+                    with upper and lower case, a number, and a symbol.</small></div>
             <div class="field"><label for="confirmPassword">Confirm password</label><input id="confirmPassword"
                     name="confirmPassword" type="password" required autocomplete="new-password"></div>
             <button class="primary" type="submit">Register</button>
             <p class="msg" id="msg" role="status"></p>
             <p class="alt">Have an account? <a href="/login.html">Log in</a></p>
         </form>
+        <form class="panel" id="cf" hidden novalidate>
+            <h1>Confirm email</h1>
+            <p class="msg" id="cmsg" role="status"></p>
+            <div class="field"><label for="code">6-digit code</label><input id="code" name="code" type="text" required
+                    inputmode="numeric" pattern="[0-9]{6}" autocomplete="one-time-code"></div>
+            <button class="primary" type="submit">Confirm</button>
+            <p class="alt"><a href="#" id="resend">Send a new code</a></p>
+        </form>
     </main>
+    <script src="/config.js"></script>
+    <script src="/auth.js"></script>
     <script>
-        const f = document.getElementById("f"), msg = document.getElementById("msg");
+        const f = document.getElementById("f"), cf = document.getElementById("cf");
+        const msg = document.getElementById("msg"), cmsg = document.getElementById("cmsg");
         const p = f.password, c = f.confirmPassword;
-        function check() { c.setCustomValidity(c.value === p.value ? "" : "Passwords do not match.") }
+        let pendingEmail = "";
+        function check() { c.setCustomValidity(c.value === p.value ? "" : "Passwords do not match."); }
         p.addEventListener("input", check); c.addEventListener("input", check);
-        f.addEventListener("submit", e => {
+
+        f.addEventListener("submit", async (e) => {
             e.preventDefault(); check();
             if (!f.reportValidity()) return;
-            msg.textContent = "Form is valid. Account creation connects to the API in Milestone 2.";
+            msg.textContent = "Creating account...";
+            try {
+                pendingEmail = f.email.value.trim();
+                await BB_AUTH.signUp(pendingEmail, p.value, f.nickname.value.trim());
+                f.hidden = true; cf.hidden = false;
+                cmsg.textContent = "We sent a 6-digit code to " + pendingEmail + ". Enter it below.";
+            } catch (err) { msg.textContent = err.message; }
+        });
+
+        cf.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            if (!cf.reportValidity()) return;
+            try {
+                await BB_AUTH.confirm(pendingEmail, cf.code.value.trim());
+                location.href = "/login.html";
+            } catch (err) { cmsg.textContent = err.message; }
+        });
+
+        document.getElementById("resend").addEventListener("click", async (e) => {
+            e.preventDefault();
+            try { await BB_AUTH.resend(pendingEmail); cmsg.textContent = "A new code was sent."; }
+            catch (err) { cmsg.textContent = err.message; }
         });
     </script>
 </body>
