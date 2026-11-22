@@ -12,7 +12,7 @@
     <header class="site">
         <div class="wrap bar">
             <a class="logo" href="/index.html">BoxingBlog</a>
-            <nav><a href="/login.html">Log in</a><a class="cta" href="/register.html">Register</a></nav>
+            <nav id="nav"></nav>
         </div>
     </header>
     <main class="wrap">
@@ -27,12 +27,18 @@
             <p class="alt">No account? <a href="/register.html">Register</a></p>
         </form>
     </main>
+    <script src="/config.js"></script>
+    <script src="/auth.js"></script>
     <script>
         const f = document.getElementById("f"), msg = document.getElementById("msg");
-        f.addEventListener("submit", e => {
+        f.addEventListener("submit", async (e) => {
             e.preventDefault();
             if (!f.reportValidity()) return;
-            msg.textContent = "Form is valid. Login connects to the API in Milestone 2.";
+            msg.textContent = "Signing in...";
+            try {
+                await BB_AUTH.login(f.email.value.trim(), f.password.value);
+                location.href = "/search.html";
+            } catch (err) { msg.textContent = err.message; }
         });
     </script>
 </body>
