@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Search - BoxingBlog</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin: 24px 0
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: var(--surface);
+            color: var(--ink);
+            font: inherit
+        }
+
+        .controls .primary {
+            width: auto
+        }
+    </style>
+</head>
+
+<body>
+    <header class="site">
+        <div class="wrap bar">
+            <a class="logo" href="/index.html">BoxingBlog</a>
+            <nav id="nav"></nav>
+        </div>
+    </header>
+    <main class="wrap">
+        <section class="hero">
+            <h1>Find fighters and fights.</h1>
+            <p class="meta" id="acct"></p>
+        </section>
+        <form class="controls" id="f">
+            <select id="type" aria-label="Search for">
+                <option value="players">Fighters</option>
+                <option value="matches">Matches</option>
+            </select>
+            <input type="search" id="name" placeholder="Name" maxlength="40" aria-label="Name">
+            <select id="wc" aria-label="Weight class"></select>
+            <select id="sort" aria-label="Sort by"></select>
+            <select id="order" aria-label="Order">
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+            </select>
+            <button class="primary" type="submit">Search</button>
+        </form>
+        <p class="msg" id="msg" role="status"></p>
+        <section class="grid" id="results" aria-live="polite"></section>
+    </main>
+    <script src="/config.js"></script>
+    <script src="/auth.js"></script>
+    <script>
+        const SORTS = { players: [["name", "Name"], ["wins", "Wins"], ["kos", "Knockouts"]], matches: [["date", "Date"], ["weightClass", "Weight class"]] };
+        const CLASSES = ["flyweight", "featherweight", "lightweight", "welterweight", "middleweight", "cruiserweight", "heavyweight"];
+        const $ = (id) => document.getElementById(id);
+        const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; n.textContent = text; return n; };
+        const fill = (sel, opts) => { sel.textContent = ""; opts.forEach(([v, t]) => { const o = document.createElement("option"); o.value = v; o.textContent = t; sel.appendChild(o); }); };
+
+        fill($("wc"), [["", "All weight classes"], ...CLASSES.map((c) => [c, c])]);
+        const setSorts = () => fill($("sort"), SORTS[$("type").value]);
+        setSorts();
+        $("type").addEventListener("change", setSorts);
+
+        function card(type, i) {
+            const a = el("article", "card");
+            a.appendChild(el("span", "tag", i.weightClass));
+            if (type === "players") {
+                a.appendChild(el("h3", "", i.name));
+                a.appendChild(el("p", "", i.wins + " wins, " + i.kos + " knockouts"));
+                a.appendChild(el("span", "meta", i.country));
+            } else {
+                a.appendChild(el("h3", "", i.fighterA + " vs " + i.fighterB));
+                a.appendChild(el("p", "", "Winner: " + i.winner + " (" + i.method + ")"));
+                a.appendChild(el("span", "meta", i.date));
+            }
+            return a;
+        }
+
+        $("f").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const type = $("type").value, q = new URLSearchParams();
+            if ($("name").value.trim()) q.set("name", $("name").value.trim());
+            if ($("wc").value) q.set("weightClass", $("wc").value);
+            q.set("sort", $("sort").value); q.set("order", $("order").value);
+            $("msg").textContent = "Searching...";
+            $("results").textContent = "";
+            try {
+                const d = await BB_AUTH.api("/" + type + "?" + q);
+                $("msg").textContent = d.count + " result" + (d.count === 1 ? "" : "s");
+                d.items.forEach((i) => $("results").appendChild(card(type, i)));
+            } catch (err) { $("msg").textContent = err.message; }
+        });
+
+        if (BB_AUTH.token()) {
+            BB_AUTH.api("/me", true).then((d) => { $("acct").textContent = "Signed in as " + d.email; })
+                .catch((err) => { $("acct").textContent = err.message; });
+        } else {
+            $("acct").textContent = "Search works without an account. Log in to see your account details.";
+        }
+    </script>
+</body>
+
+</html>
